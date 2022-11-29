@@ -1,4 +1,7 @@
+use rustyline::Editor;
+use rustyline::error::ReadlineError;
 use std::process::{self, Command, exit};
+use std::collections::HashMap;
 use std::io::{self, stdout, stdin, Write, Read};
 use std::fs::{self, File};
 use std::str::{self, from_utf8};
@@ -6,6 +9,9 @@ use std::env::{self, current_dir, set_current_dir};
 use std::path::{self, Path};
 
 fn main(){
+    let mut aliases: HashMap<&str, &str> = HashMap::new();
+    aliases.insert("ls", "ls --color=auto");
+    aliases.insert("grep", "grep --color==auto");
     let paths = vec!["/usr/bin", "/bin"];
     let mut os_seperator = "/";
     let mut etc_hostname = File::open("/etc/hostname").expect("/etc/hostname could not be opened");
@@ -15,15 +21,15 @@ fn main(){
     let mut uname: String = from_utf8(&uname_command.output().unwrap().stdout[..]).unwrap().to_string();
     hostname.pop();
     uname.pop();
+    let mut reader = Editor::<()>::new().unwrap();
     loop{
         let mut current_user_dir: String = current_dir().unwrap().to_str().expect("Current directory could not be read").to_string();
         let current_user_dir_basename_arr: Vec<&str> = current_user_dir.split(os_seperator.clone()).collect();
         let current_user_dir_basename: &str = current_user_dir_basename_arr[current_user_dir_basename_arr.len() - 1];
-        print!("\x1b[92m[{}@{} \x1b[0m{}\x1b[92m]$ \x1b[0m", uname, hostname, current_user_dir_basename);
+        let prompt = format!("[{}@{} {}]$ ", uname, hostname, current_user_dir_basename);
+        let readline = reader.readline(prompt.as_str()).unwrap();
         stdout().flush();
-        let mut user_command = String::new();
-        stdin().read_line(&mut user_command).unwrap();
-        let mut parts = user_command.trim().split_whitespace();
+        let mut parts = readline.trim().split_whitespace();
         let command = parts.next().unwrap();
         let args = parts;
         match command{
