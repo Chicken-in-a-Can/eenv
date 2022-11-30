@@ -1,22 +1,21 @@
 mod get_info;
 mod alias;
+mod prompt;
 
 use rustyline::Editor;
-use colored::Colorize;
 use std::process::{Command, exit};
 use std::env::set_current_dir;
 use std::path::Path;
 use std::collections::HashMap;
 
 fn main(){
+    let prompt_and_read: (String, String) = prompt::get_prompt();
+    let read_prompt = prompt_and_read.clone().1;
     let aliases: HashMap<String, String> = alias::get_aliases();
     let paths = vec!["/usr/bin", "/bin"];
-    let hostname = get_info::get_hostname();
-    let uname = get_info::get_username();
     let mut reader = Editor::<()>::new().unwrap();
     loop{
-        let current_user_dir_basename: String = get_info::get_current_dir(true);
-        let prompt = format!("{}{}{}{} {}{}{}", format!("[").green(), uname.green(), format!("@").green(), hostname.green(), current_user_dir_basename.white(), format!("]$").green(), format!(" ").white());
+        let prompt = prompt::prompt_gen(read_prompt.clone());
         let readline = alias::alias_swap(reader.readline(prompt.as_str()).unwrap(), aliases.clone());
         let mut parts = readline.trim().split_whitespace();
         let command = parts.next().unwrap();
@@ -30,7 +29,10 @@ fn main(){
                 let _result = set_current_dir(path_to_nav).unwrap();
             }
             "hostname" => {
-                println!("{}", hostname);
+                println!("{}", get_info::get_hostname());
+            }
+            "prompt" => {
+                println!("{}", prompt::get_prompt().0);
             }
             _ => {
                 if check_command_existence(command.clone(), paths.clone()){
