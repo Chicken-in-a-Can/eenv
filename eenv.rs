@@ -1,4 +1,5 @@
 use rustyline::Editor;
+use colored::Colorize;
 use rustyline::error::ReadlineError;
 use std::process::{self, Command, exit};
 use std::collections::HashMap;
@@ -26,7 +27,7 @@ fn main(){
         let mut current_user_dir: String = current_dir().unwrap().to_str().expect("Current directory could not be read").to_string();
         let current_user_dir_basename_arr: Vec<&str> = current_user_dir.split(os_seperator.clone()).collect();
         let current_user_dir_basename: &str = current_user_dir_basename_arr[current_user_dir_basename_arr.len() - 1];
-        let prompt = format!("[{}@{} {}]$ ", uname, hostname, current_user_dir_basename);
+        let prompt = format!("{}{}{}{} {}{}{}", format!("[").green(), uname.green(), format!("@").green(), hostname.green(), current_user_dir_basename.white(), format!("]$").green(), format!(" ").white());
         let readline = reader.readline(prompt.as_str()).unwrap();
         stdout().flush();
         let mut parts = readline.trim().split_whitespace();
