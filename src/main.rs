@@ -1,35 +1,24 @@
+mod info;
+mod alias;
+
 use rustyline::Editor;
 use colored::Colorize;
-use rustyline::error::ReadlineError;
-use std::process::{self, Command, exit};
+use std::process::{Command, exit};
+use std::env::set_current_dir;
+use std::path::Path;
 use std::collections::HashMap;
-use std::io::{self, stdout, stdin, Write, Read};
-use std::fs::{self, File};
-use std::str::{self, from_utf8};
-use std::env::{self, current_dir, set_current_dir};
-use std::path::{self, Path};
 
 fn main(){
-    let mut aliases: HashMap<&str, &str> = HashMap::new();
-    aliases.insert("ls", "ls --color=auto");
-    aliases.insert("grep", "grep --color==auto");
+    let aliases = alias::get_aliases();
     let paths = vec!["/usr/bin", "/bin"];
-    let mut os_seperator = "/";
-    let mut etc_hostname = File::open("/etc/hostname").expect("/etc/hostname could not be opened");
-    let mut hostname = String::new();
-    etc_hostname.read_to_string(&mut hostname).expect("Unable to read /etc/hostname");
-    let mut uname_command = Command::new("whoami");
-    let mut uname: String = from_utf8(&uname_command.output().unwrap().stdout[..]).unwrap().to_string();
-    hostname.pop();
-    uname.pop();
+    let hostname = info::get_hostname();
+    let uname = info::get_username();
     let mut reader = Editor::<()>::new().unwrap();
     loop{
-        let mut current_user_dir: String = current_dir().unwrap().to_str().expect("Current directory could not be read").to_string();
-        let current_user_dir_basename_arr: Vec<&str> = current_user_dir.split(os_seperator.clone()).collect();
-        let current_user_dir_basename: &str = current_user_dir_basename_arr[current_user_dir_basename_arr.len() - 1];
+        let current_user_dir_basename: String = info::get_current_dir(true);
         let prompt = format!("{}{}{}{} {}{}{}", format!("[").green(), uname.green(), format!("@").green(), hostname.green(), current_user_dir_basename.white(), format!("]$").green(), format!(" ").white());
         let readline = reader.readline(prompt.as_str()).unwrap();
-        stdout().flush();
+        //stdout().flush();
         let mut parts = readline.trim().split_whitespace();
         let command = parts.next().unwrap();
         let args = parts;
