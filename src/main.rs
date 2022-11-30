@@ -1,4 +1,4 @@
-mod info;
+mod get_info;
 mod alias;
 
 use rustyline::Editor;
@@ -9,16 +9,15 @@ use std::path::Path;
 use std::collections::HashMap;
 
 fn main(){
-    let aliases = alias::get_aliases();
+    let aliases: HashMap<String, String> = alias::get_aliases();
     let paths = vec!["/usr/bin", "/bin"];
-    let hostname = info::get_hostname();
-    let uname = info::get_username();
+    let hostname = get_info::get_hostname();
+    let uname = get_info::get_username();
     let mut reader = Editor::<()>::new().unwrap();
     loop{
-        let current_user_dir_basename: String = info::get_current_dir(true);
+        let current_user_dir_basename: String = get_info::get_current_dir(true);
         let prompt = format!("{}{}{}{} {}{}{}", format!("[").green(), uname.green(), format!("@").green(), hostname.green(), current_user_dir_basename.white(), format!("]$").green(), format!(" ").white());
-        let readline = reader.readline(prompt.as_str()).unwrap();
-        //stdout().flush();
+        let readline = alias::alias_swap(reader.readline(prompt.as_str()).unwrap(), aliases.clone());
         let mut parts = readline.trim().split_whitespace();
         let command = parts.next().unwrap();
         let args = parts;

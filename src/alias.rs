@@ -27,3 +27,27 @@ pub fn get_aliases() -> HashMap<String, String>{
     }
     return aliases;
 }
+#[allow(dead_code)]
+pub fn alias_swap(long_command: String, aliases: HashMap<String, String>) -> String{
+    let mut space_found: bool = false;
+    let mut starting_substring = "".to_owned();
+    let mut ending_substring = "".to_owned();
+    for c in long_command.chars(){
+        if !space_found{
+            if c != ' '{
+                starting_substring = format!("{}{}", starting_substring, c);
+            }
+            else{
+                space_found = true;
+            }
+        }
+        else{
+            ending_substring = format!("{}{}", ending_substring, c);
+        }
+    }
+    if aliases.contains_key(&starting_substring.clone()){
+        starting_substring = aliases.get(&starting_substring.clone()).unwrap().clone();
+    }
+    let return_final: String = format!("{} {}", starting_substring, ending_substring);
+    return return_final;
+}
