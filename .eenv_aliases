@@ -1,0 +1,4 @@
+ls ls --color=auto
+grep grep --color=auto
+la ls -la --color=auto
+ll ls -l --color=auto

@@ -27,7 +27,7 @@ fn main(){
             }
             "cd" => {
                 let path_to_nav = args.clone().next().unwrap();
-                set_current_dir(path_to_nav);
+                let _result = set_current_dir(path_to_nav).unwrap();
             }
             "hostname" => {
                 println!("{}", hostname);
@@ -38,7 +38,7 @@ fn main(){
                         .args(args)
                         .spawn()
                         .unwrap();
-                    child.wait();
+                    let _result = child.wait().unwrap();
                 }
                 else{
                     command_not_exist(command);
