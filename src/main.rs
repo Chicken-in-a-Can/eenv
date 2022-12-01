@@ -2,6 +2,7 @@ mod get_info;
 mod alias;
 mod prompt;
 mod commandler;
+mod get_path;
 
 use rustyline::Editor;
 use std::collections::HashMap;

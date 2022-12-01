@@ -11,10 +11,10 @@ pub fn get_prompt() -> (String, String){
     if !Path::new(format!("/home/{}/.eenv_profile", uname).as_str()).exists(){
         let _result = File::create(format!("/home/{}/.eenv_profile", uname).as_str());
     }
-    let eenvrc_read = File::open(format!("/home/{}/.eenv_profile", uname).as_str()).expect("Alias file `.eenv_profile` was unable to to be opened");
-    let buffer = BufReader::new(eenvrc_read);
-    let bashrc_vec: Vec<String> = buffer.lines().map(|l| l.expect("Could not parse line")).collect();
-    for line in bashrc_vec{
+    let eenv_profile_read = File::open(format!("/home/{}/.eenv_profile", uname).as_str()).expect("file `.eenv_profile` was unable to to be opened");
+    let buffer = BufReader::new(eenv_profile_read);
+    let eenv_vec: Vec<String> = buffer.lines().map(|l| l.expect("Could not parse line")).collect();
+    for line in eenv_vec{
         let seperated_line = tools::seperate_first_substr(line);
         if seperated_line.0 == "prompt"{
             return (prompt_gen(seperated_line.1.clone()), seperated_line.1);

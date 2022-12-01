@@ -1,6 +1,7 @@
 #[path = "alias.rs"] mod alias;
 #[path = "get_info.rs"] mod get_info;
 #[path = "prompt.rs"] mod prompt;
+#[path = "get_path.rs"] mod get_path;
 
 use std::env::set_current_dir;
 use std::process::{Command, exit};
@@ -8,8 +9,9 @@ use std::path::Path;
 
 #[allow(dead_code)]
 pub fn commandler(line_read: String){
-    let paths = vec!["/usr/bin".to_owned(), "/bin".to_owned()];
-    let mut parts = line_read.trim().split_whitespace();
+    let line_swapped = get_path::home_swap(line_read);
+    let paths = get_path::get_path();
+    let mut parts = line_swapped.trim().split_whitespace();
     let command = parts.next().unwrap();
     let args = parts;
     match command{
@@ -25,6 +27,9 @@ pub fn commandler(line_read: String){
         }
         "prompt" => {
             println!("{}", prompt::get_prompt().0);
+        }
+        "path" => {
+            println!("{:?}", paths.clone());
         }
         _ => {
             let command_tuple = check_command_existence(command.clone(), paths.clone());
