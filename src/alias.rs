@@ -1,13 +1,19 @@
 #[path = "tools.rs"] mod tools;
+#[path = "get_info.rs"] mod get_info;
 
 use std::collections::HashMap;
 use std::fs::File;
+use std::path::Path;
 use std::io::{prelude::*, BufReader};
 
 #[allow(dead_code)]
 pub fn get_aliases() -> HashMap<String, String>{
     let mut aliases: HashMap<String, String> = HashMap::new();
-    let alias_read = File::open("./.eenv_aliases").expect("Alias file `.eenv_aliases` was unable to to be opened");
+    let uname = get_info::get_username();
+    if !Path::new(format!("/home/{}/.eenv_aliases", uname).as_str()).exists(){
+        let _result = File::create(format!("/home/{}/.eenv_aliases", uname));
+    }
+    let alias_read = File::open(format!("/home/{}/.eenv_aliases", uname).as_str()).expect("Alias file `~/.eenv_aliases` was unable to to be opened");
     let buffer = BufReader::new(alias_read);
     let alias_vec: Vec<String> = buffer.lines().map(|l| l.expect("Could not parse line")).collect();
     for alias in alias_vec{

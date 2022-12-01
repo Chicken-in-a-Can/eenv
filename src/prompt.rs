@@ -2,11 +2,16 @@
 #[path = "get_info.rs"] mod get_info;
 use std::fs::File;
 use std::io::{prelude::*, BufReader};
+use std::path::Path;
 use colored::Colorize;
 
 #[allow(dead_code)]
 pub fn get_prompt() -> (String, String){
-    let eenvrc_read = File::open("./.eenvrc").expect("Alias file `.eenvrc` was unable to to be opened");
+    let uname = get_info::get_username();
+    if !Path::new(format!("/home/{}/.eenv_profile", uname).as_str()).exists(){
+        let _result = File::create(format!("/home/{}/.eenv_profile", uname).as_str());
+    }
+    let eenvrc_read = File::open(format!("/home/{}/.eenv_profile", uname).as_str()).expect("Alias file `.eenv_profile` was unable to to be opened");
     let buffer = BufReader::new(eenvrc_read);
     let bashrc_vec: Vec<String> = buffer.lines().map(|l| l.expect("Could not parse line")).collect();
     for line in bashrc_vec{
@@ -16,7 +21,6 @@ pub fn get_prompt() -> (String, String){
         }
     }
     return ("> ".to_owned(), "> ".to_owned());
-
 }
 
 #[allow(dead_code)]
@@ -64,6 +68,7 @@ pub fn prompt_gen(prompt: String) -> String{
     return final_string;
 }
 
+#[allow(unused_assignments)]
 fn color_substring(substr: String, color: char) -> String{
     let mut colored_substr = String::new();
     match color{
@@ -80,6 +85,7 @@ fn color_substring(substr: String, color: char) -> String{
     return colored_substr;
 }
 
+#[allow(unused_assignments)]
 fn prompt_info_handler(info_char: char) -> String{
     let mut return_string = "".to_owned();
     match info_char{
