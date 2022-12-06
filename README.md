@@ -1,2 +1,3 @@
-# eenv
-Executive Environment
+# Executive Environment
+
+Shell written in Rust
