@@ -53,6 +53,67 @@ pub fn home_swap(pre_swap: String) -> String{
     return return_string;
 }
 
+#[allow(dead_code)]
+pub fn here_swap(pre_swap: String) -> String{
+    let current = get_info::get_current_dir(false);
+    let mut return_string = "".to_owned();
+    let swap_key = get_here_key();
+    let mut i: usize = 0;
+    while i < pre_swap.len(){
+        if i >= 1{
+            if pre_swap.chars().nth(i - 1).unwrap() == ' ' && pre_swap.chars().nth(i).unwrap() == swap_key{
+                return_string = format!("{}{}", return_string, format!("{}", current));
+            }
+            else{
+                return_string = format!("{}{}", return_string, pre_swap.chars().nth(i).unwrap());
+            }
+        }
+        else{
+            if pre_swap.chars().nth(i).unwrap() == swap_key{
+                return_string = format!("{}{}", return_string, format!("{}", current));
+            }
+            else{
+                return_string = format!("{}{}", return_string, pre_swap.chars().nth(i).unwrap());
+            }
+        }
+        i += 1;
+    }
+    return return_string;
+}
+
+#[allow(dead_code)]
+pub fn back_swap(pre_swap: String) -> String{
+    let current = get_info::get_current_dir(false).replace(format!("/{}", get_info::get_current_dir(true)).as_str(), "");
+    let mut return_string = "".to_owned();
+    let swap_key = get_back_key();
+    let mut i: usize = 0;
+    while i < pre_swap.len(){
+        if i >= 2{
+            if i < pre_swap.len() - 1 && pre_swap.chars().nth(i - 1).unwrap() == ' ' && pre_swap[(i)..(i+2)] == swap_key{
+                return_string = format!("{}{}", return_string, format!("{}", current));
+                i += 1;
+            }
+            else{
+                return_string = format!("{}{}", return_string, pre_swap.chars().nth(i).unwrap());
+            }
+        }
+        else if i >= 1{
+            if i < pre_swap.len() - 1 && pre_swap[(i)..(i+2)] == swap_key{
+                return_string = format!("{}{}", return_string, format!("{}", current));
+                i += 1;
+            }
+            else{
+                return_string = format!("{}{}", return_string, pre_swap.chars().nth(i).unwrap());
+            }
+        }
+        else{
+            return_string = format!("{}{}", return_string, pre_swap.chars().nth(i).unwrap());
+        }
+        i += 1;
+    }
+    return return_string;
+}
+
 fn get_home_key() -> char{
     let uname: String = get_info::get_username();
     if !Path::new(format!("/home/{}/.eenv_profile", uname).as_str()).exists(){
@@ -68,4 +129,38 @@ fn get_home_key() -> char{
         }
     }
     return '~'
+}
+
+fn get_here_key() -> char{
+    let uname: String = get_info::get_username();
+    if !Path::new(format!("/home/{}/.eenv_profile", uname).as_str()).exists(){
+        let _result = File::create(format!("/home/{}/.eenv_profile", uname).as_str());
+    }
+    let eenv_profile_read = File::open(format!("/home/{}/.eenv_profile", uname).as_str()).expect("file `.eenv_profile` was unable to be opened");
+    let buffer = BufReader::new(eenv_profile_read);
+    let eenv_vec: Vec<String> = buffer.lines().map(|l| l.expect("Could not parse line")).collect();
+    for line in eenv_vec{
+        let seperated_line = tools::seperate_first_substr(line);
+        if seperated_line.0 == "here"{
+            return seperated_line.1.chars().nth(0).unwrap();
+        }
+    }
+    return '.'
+}
+
+fn get_back_key() -> String{
+    let uname: String = get_info::get_username();
+    if !Path::new(format!("/home/{}/.eenv_profile", uname).as_str()).exists(){
+        let _result = File::create(format!("/home/{}/.eenv_profile", uname).as_str());
+    }
+    let eenv_profile_read = File::open(format!("/home/{}/.eenv_profile", uname).as_str()).expect("file `.eenv_profile` was unable to be opened");
+    let buffer = BufReader::new(eenv_profile_read);
+    let eenv_vec: Vec<String> = buffer.lines().map(|l| l.expect("Could not parse line")).collect();
+    for line in eenv_vec{
+        let seperated_line = tools::seperate_first_substr(line);
+        if seperated_line.0 == "back" && seperated_line.1.len() >= 2{
+            return format!("{}{}", seperated_line.1.chars().nth(0).unwrap(), seperated_line.1.chars().nth(1).unwrap());
+        }
+    }
+    return "..".to_owned()
 }

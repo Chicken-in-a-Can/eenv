@@ -9,7 +9,7 @@ use std::path::Path;
 
 #[allow(dead_code)]
 pub fn commandler(line_read: String){
-    let line_swapped = get_path::home_swap(line_read);
+    let line_swapped = get_path::here_swap(get_path::back_swap(get_path::home_swap(line_read)));
     let paths = get_path::get_path();
     let mut parts = line_swapped.trim().split_whitespace();
     let command = parts.next().unwrap();
