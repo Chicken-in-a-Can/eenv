@@ -1,3 +1,5 @@
 prompt [{u}@{h}|g| {b}|w|]$|g| |w|
 path /bin /usr/bin /usr/local/bin
 home ~
+here .
+back ..
