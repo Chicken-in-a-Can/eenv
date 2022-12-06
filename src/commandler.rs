@@ -49,6 +49,9 @@ pub fn commandler(line_read: String){
 }
 fn check_command_existence(command: &str, paths: Vec<String>) -> (bool, String){
     let mut return_tuple = (false, "".to_owned());
+    if command.chars().nth(0).unwrap() == '/'{
+        return_tuple = (true, command.to_owned());
+    }
     for single_path in paths{
         if Path::new(format!("{}/{}", single_path.clone(), command.clone()).as_str()).exists(){
             return_tuple = (true, format!("{}/{}", single_path, command));
