@@ -1,3 +1,11 @@
+/* Executive Environment
+ * by Ben Stidham
+ *
+ * A shell written in Rust for BossOS (https://github.com/Chicken-in-a-Can/the-executive-os)
+ * Feel free to use and modify it. Just don't sue me if it breaks your system :)
+ * Only tested on Arch (superior)
+ */
+
 // Get functions from local files
 mod get_info;
 mod alias;
